@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { END_POINT } from '../../Assests/Container';
 import {useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 
 
 function AllProducts() {
@@ -15,7 +16,9 @@ function AllProducts() {
 
     const [filterOption, setFilteredOption] = useState({ actor: '', director: '', year: null, language: '' });
     const [isFilter, setIsFilter] = useState(false);
+    const [log, setLog] = useState(false);
     const history = useNavigate();
+    const isLonggedIn = useSelector((state) => state.isLoggedIn);
 
     const handleSelectChange = (event) => {
         let { name, value } = event.target;
@@ -28,6 +31,7 @@ function AllProducts() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                if(log){
                 const specificEndpoint = '/product/getAllProductExclude/';
                 const id = localStorage.getItem('id');
                 const fullUrl = `${END_POINT}${specificEndpoint}${id}`;
@@ -43,6 +47,23 @@ function AllProducts() {
                 setUniqueBachelors(bachelors);
                 setUniqueFacing(facing);
                 setUniqueBathroom(bathroom);
+                }else{
+                const specificEndpoint = '/product/getAllProduct/';
+                const fullUrl = `${END_POINT}${specificEndpoint}`;
+                const response = await axios.get(fullUrl); 
+                setProducts(response.data.products);
+
+                const bedroom = [...new Set(response.data.products.map(product => product.bedroom))];
+                const bachelors = [...new Set(response.data.products.map(product => product.bachelors))];
+                const facing = [...new Set(response.data.products.map(product => product.facing))];
+                const bathroom = [...new Set(response.data.products.map(product => product.bathroom))];
+
+                setUniqueBedroom(bedroom);
+                setUniqueBachelors(bachelors);
+                setUniqueFacing(facing);
+                setUniqueBathroom(bathroom);
+                }
+                
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -50,6 +71,11 @@ function AllProducts() {
 
         fetchProducts();
     }, []);
+
+    useEffect(() => {
+        setLog(isLonggedIn);
+        console.log(isLonggedIn)
+      }, [isLonggedIn]);
 
     const filterProducts = (selection) => {
         if (!selection.bedroom && !selection.bachelors && !selection.facing && !selection.bathroom) {
