@@ -276,7 +276,7 @@ function AllProducts() {
                     <div className='flex flex-wrap'>
                     {isFilter ? (
                         filteredProducts.map((e) => (
-                            <div className='h-[320px] w-[260px] m-4 mb-8 relative'>
+                            <div className='h-[320px] w-[260px] m-4 mb-8 relative cursor-pointer' onClick={()=>openProduct(e._id)}>
                                 <img className='h-full' src={e.posterURL} alt={e.type} />
                                 <div className="absolute bottom-0 w-full bg-black bg-opacity-70 text-white px-1 py-0.5">
                                     {e.type} | {e.facing} | likes - {e.likes} 
